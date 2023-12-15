@@ -8,7 +8,7 @@ A simple todo list app built with [vite](https://vitejs.dev/) and [lit](https://
 https://www.figma.com/file/yTpPsc2YBFWimx7WgTh3SA/Taski-(Todo-App)-(Community)?type=design&node-id=0-1&mode=design
 
 #### Disclaimer:
-	I do not own the design
+I do not own the design
 
 ## Running the app locally
 * install nodejs (skip this step if you have already installed nodejs)
