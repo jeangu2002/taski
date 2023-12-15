@@ -1,6 +1,6 @@
 import { Router } from "@vaadin/router";
 import { LitElement, PropertyValueMap, css, html } from "lit";
-import { customElement } from "lit/decorators.js";
+import { customElement, property } from "lit/decorators.js";
 
 import { GLOBAL_STYLES } from "./styles";
 import './pages/TaskOverview';
@@ -9,9 +9,9 @@ import { routes } from "./routes";
 @customElement('todo-app')
 class App extends LitElement {
     private _router:Router;
+
     constructor() {
         super();
-
     }
 
 
@@ -21,6 +21,14 @@ class App extends LitElement {
             width: 100%;
             background-color: #ffffff;
         }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 48px;
+            height: 100%;
+        }
+
         .logo {
             display: flex;
             gap: 6px;
@@ -50,14 +58,19 @@ class App extends LitElement {
             object-fit: cover;
             aspect-ratio: 1/1;
             border-radius: 50%;
+        }        
+        
+        main {
+            flex: 1;
+            display: flex;
         }
 
-        .container {
-            display: flex;
-            flex-direction: column;
-            gap: 48px;
+        task-overview {
+            width: 100%;
+            display: grid;
+            grid-template-rows: max-content 1fr;
         }
-     
+
      `
 
      protected firstUpdated(): void {

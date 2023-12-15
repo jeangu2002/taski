@@ -11,6 +11,13 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* COLORS */
+  --tl-slateBlue: #8D9CB8;
+  --tl-paleWhite: #F5F7F9;
+  --tl-blue: #007FFF;
+  --tl-mutedAzure: #C6CFDC;
+  --tl-blue-10-percent-opacity: rgba(0, 127, 255, .1);
 }
 
 a {
@@ -61,10 +68,5 @@ todo-app {
   :root {
     color: #213547;
     background-color: #ffffff;
-    /* COLORS */
-    --tl-slateBlue: #8D9CB8;
-    --tl-paleWhite: #F5F7F9;
-    --tl-blue: #007FFF;
-    --tl-mutedAzure: #C6CFDC;
   }
 }
