@@ -27,7 +27,11 @@ export class CreateTask extends LitElement {
             padding: 42px;
             transition: transform 500ms ease-in;
             transform: translateY(100vh);
-            position: absolute;
+            position: fixed;
+            top: calc(50vh - 286px / 2);
+            left: calc(50vw - 255px / 2);
+            z-index: 10;
+            background-color: white;
             display: flex;
             flex-direction: column;
             gap: 32px;
