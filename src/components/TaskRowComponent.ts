@@ -4,7 +4,7 @@ import { customElement, property } from "lit/decorators.js";
 import { GLOBAL_STYLES } from "../styles";
 
 @customElement('task-row')
-class TaskRow extends LitElement {
+class TaskRowComponent extends LitElement {
 
     @property({type: Number})
     taskId?: number;
@@ -113,7 +113,12 @@ class TaskRow extends LitElement {
                     <strong .className="${this._lineThrough}"> 
                         ${this.taskTitle}
                     </strong></div>
-                <p class="task__description ${this._showTaskDescription ? 'task__description--expanded' : '' }" > ${this.taskDescription} </p>
+                    ${
+                        this._showTaskDescription ? 
+                        html`<p class="task__description task__description--expanded" > ${this.taskDescription} </p>`
+                        : nothing
+                    }
+                
 
             </div>
             <div class="task__actions">
@@ -171,6 +176,6 @@ class TaskRow extends LitElement {
 
 declare global {
     interface HTMLElementTagNameMap {
-      'task-row': TaskRow
+      'task-row': TaskRowComponent
     }
   }

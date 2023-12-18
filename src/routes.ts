@@ -1,7 +1,12 @@
 export const routes = [
     {
-        name: 'tastOveview',
+        name: 'taskOveview',
         path: '/',
         component: 'task-overview',
-      }
+     },
+     {
+      name: 'newTask',
+      path: '/',
+      component: 'create-task',
+    }
 ]

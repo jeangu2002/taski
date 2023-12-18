@@ -9,6 +9,11 @@ export const GLOBAL_STYLES = css`
     margin: 0;
     }
 
+    button {
+        border: none;
+        background-color: transparent;
+    }
+
     button:hover {
         cursor: pointer;
     }

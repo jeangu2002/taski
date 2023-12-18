@@ -1,6 +1,7 @@
 import { Router } from "@vaadin/router";
-import { LitElement, PropertyValueMap, css, html } from "lit";
-import { customElement, property } from "lit/decorators.js";
+import { LitElement, css, html } from "lit";
+import { customElement } from "lit/decorators.js";
+import "reflect-metadata";
 
 import { GLOBAL_STYLES } from "./styles";
 import './pages/TaskOverview';

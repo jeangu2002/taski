@@ -3,22 +3,31 @@ import { LitElement, css, html, nothing } from "lit";
 import { GLOBAL_STYLES } from "../styles";
 import { customElement, property } from "lit/decorators.js";
 import { TASKS } from "../data/tasks";
-import '../components/TaskRow'
+import '../components/TaskRowComponent'
 import { repeat } from "lit/directives/repeat.js";
+import { TaskService } from "../services/TaskService";
+import { BeforeEnterObserver } from "@vaadin/router";
+import Container, { Inject, Service } from "typedi";
+import { Task } from "../models/Task";
+import { Ref, createRef, ref } from "lit/directives/ref.js";
 
 @customElement('task-overview')
-export class TaskOverview extends LitElement {
+
+export class TaskOverview extends LitElement implements BeforeEnterObserver {
 
     @property({type: String})
     __searchInputValue?: String
 
+    searchInputRef:Ref<HTMLInputElement> = createRef()
+
     @property({type: Array})
     __tasksList?:Task[]
     
-    constructor() {
+    constructor(private taskService:TaskService) {
         super();
         this.__searchInputValue = '';
         this.__tasksList = [];
+        this.taskService = Container.get(TaskService)
     }
     static override styles = css`
         ${GLOBAL_STYLES}
@@ -99,7 +108,12 @@ export class TaskOverview extends LitElement {
             flex-flow: column nowrap;
             gap: 33px;
         }
-
+        .add-new-task {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: var(--tl-slateBlue);
+        }
         .create-task__btn {
             background-color: rgba(0, 127, 255, .1);
             color: var(--tl-blue);
@@ -116,17 +130,32 @@ export class TaskOverview extends LitElement {
 
     `;
 
-    protected firstUpdated(): void {
-       this.__tasksList = TASKS;
+    onBeforeEnter(location, commands, router) {
+        console.log(location)
+        console.log(router)
     }
 
-    private _handleSearchInput(e) {
-       this.__searchInputValue = (<HTMLInputElement>this.shadowRoot?.getElementById('search-input')).value;
+    protected async firstUpdated(): Promise<void> {
+       //this.__tasksList = TASKS;
+       const {data} = await this.taskService.getAllTasks();
+        console.log(data);
+        this.__tasksList = data;
+    }
+
+    private _handleSearchInput() {
+        const input = this.searchInputRef.value;
+        if(input) {
+            this.__searchInputValue = input.value;
+        }
+       
     }
 
     private _clearSearchInput() {
         this.__searchInputValue = '';
-        (<HTMLInputElement>this.shadowRoot?.getElementById('search-input')).value = ''; // not sure why 2 way databing doesn't work
+        const input = this.searchInputRef.value;
+        if(input) {
+            input.value = ''; // not sure why 2 way databing doesn't work
+        }
     }
 
     protected render() {
@@ -138,7 +167,7 @@ export class TaskOverview extends LitElement {
                 </div>
 
                 <div class="task-search">
-                    <input id="search-input" type="text" placeholder="Search" class="task-search-input" @input=${this._handleSearchInput} value="${this.__searchInputValue}" />
+                    <input id="search-input" ${ref(this.searchInputRef)} type="text" placeholder="Search" class="task-search-input" @input=${this._handleSearchInput} value="${this.__searchInputValue}" />
                     <svg class="task-search__magnifying-glass" role="presentation" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M6.53425 11.5476C7.23668 11.5476 7.89662 11.4157 8.51407 11.152C9.13153 10.8883 9.67534 10.5236 10.1455 10.0579C10.6157 9.58653 10.9839 9.04506 11.2501 8.43346C11.522 7.82185 11.658 7.16816 11.658 6.47238C11.658 5.77661 11.522 5.12292 11.2501 4.51131C10.9839 3.8997 10.6157 3.36104 10.1455 2.89532C9.67534 2.4296 9.13153 2.06488 8.51407 1.80116C7.89662 1.53183 7.23668 1.39716 6.53425 1.39716C5.83183 1.39716 5.17189 1.53183 4.55443 1.80116C3.93698 2.06488 3.39033 2.4296 2.9145 2.89532C2.44433 3.36104 2.07612 3.8997 1.80988 4.51131C1.54364 5.12292 1.41052 5.77661 1.41052 6.47238C1.41052 7.16816 1.54364 7.82185 1.80988 8.43346C2.07612 9.04506 2.44433 9.58653 2.9145 10.0579C3.39033 10.5236 3.93698 10.8883 4.55443 11.152C5.17189 11.4157 5.83183 11.5476 6.53425 11.5476ZM6.53425 12.9448C5.63356 12.9448 4.78952 12.7764 4.00212 12.4398C3.21473 12.1031 2.5208 11.6374 1.92034 11.0426C1.31988 10.4478 0.849708 9.76048 0.509825 8.98054C0.169942 8.2006 0 7.36455 0 6.47238C0 5.58022 0.169942 4.74417 0.509825 3.96423C0.849708 3.17868 1.31988 2.49132 1.92034 1.90216C2.5208 1.30738 3.21473 0.841662 4.00212 0.504997C4.79519 0.168332 5.63923 0 6.53425 0C7.43494 0 8.27899 0.168332 9.06638 0.504997C9.85378 0.841662 10.5477 1.30738 11.1482 1.90216C11.7486 2.49693 12.2188 3.18429 12.5587 3.96423C12.8986 4.74417 13.0685 5.58022 13.0685 6.47238C13.0685 7.36455 12.8986 8.2006 12.5587 8.98054C12.2188 9.76048 11.7486 10.4478 11.1482 11.0426C10.5477 11.6374 9.85378 12.1031 9.06638 12.4398C8.27899 12.7764 7.43494 12.9448 6.53425 12.9448ZM15.0568 16C14.9265 16 14.8019 15.9776 14.683 15.9327C14.564 15.8878 14.4564 15.8176 14.3601 15.7223L9.84811 11.253L11.2416 9.91478L15.7281 14.3672C15.8244 14.457 15.8924 14.5608 15.932 14.6786C15.9773 14.7964 16 14.9171 16 15.0405C16 15.2201 15.9575 15.38 15.8725 15.5203C15.7932 15.6661 15.6828 15.7812 15.5412 15.8653C15.3995 15.9551 15.2381 16 15.0568 16Z" fill="#C6CFDC"/>
                     </svg>
@@ -154,8 +183,21 @@ export class TaskOverview extends LitElement {
                 </div>
             </div>
             <div class="task-list">
+                
                 ${
-                    this.__tasksList?.length ? html`${repeat(this.__tasksList, task => task.taskId, (task, index) => {
+                    this.__tasksList?.length ? html`
+                    <div class="add-new-task">
+                        <button>
+                            <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13 8.59277V17.3844" stroke="#C6CFDC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M17.3999 12.9886H8.59985" stroke="#C6CFDC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M18.6229 1H7.37714C3.45714 1 1 3.7745 1 7.70219V18.2978C1 22.2255 3.44571 25 7.37714 25H18.6229C22.5543 25 25 22.2255 25 18.2978V7.70219C25 3.7745 22.5543 1 18.6229 1Z" stroke="#C6CFDC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <span> Add a new task</span>
+                    </div>
+                    
+                    ${repeat(this.__tasksList, task => task.taskId, (task, index) => {
                         return html`<task-row 
                                         .taskTitle=${task.title} 
                                         .taskDescription=${task.description} 
