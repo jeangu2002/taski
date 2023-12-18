@@ -2,14 +2,15 @@ import { LitElement, css, html, nothing } from "lit";
 
 import { GLOBAL_STYLES } from "../styles";
 import { customElement, property } from "lit/decorators.js";
-import { TASKS } from "../data/tasks";
 import '../components/TaskRowComponent'
 import { repeat } from "lit/directives/repeat.js";
 import { TaskService } from "../services/TaskService";
 import { BeforeEnterObserver } from "@vaadin/router";
-import Container, { Inject, Service } from "typedi";
+import Container from "typedi";
+import '../components/CreateTask';
 import { Task } from "../models/Task";
 import { Ref, createRef, ref } from "lit/directives/ref.js";
+import { CreateTask } from "../components/CreateTask";
 
 @customElement('task-overview')
 
@@ -18,7 +19,8 @@ export class TaskOverview extends LitElement implements BeforeEnterObserver {
     @property({type: String})
     __searchInputValue?: String
 
-    searchInputRef:Ref<HTMLInputElement> = createRef()
+    searchInputRef:Ref<HTMLInputElement> = createRef();
+    createTaskDialogRef:Ref<CreateTask> = createRef();
 
     @property({type: Array})
     __tasksList?:Task[]
@@ -83,10 +85,6 @@ export class TaskOverview extends LitElement implements BeforeEnterObserver {
 
         }
 
-        .task-search-input::placeholder {
-            color: #C6CFDC;
-        }
-
         .task-search-input:focus {
             outline: none;
         }
@@ -100,6 +98,7 @@ export class TaskOverview extends LitElement implements BeforeEnterObserver {
             display: flex;
             flex-direction: column;
             gap: 1.25rem;
+            position: relative;
         }
         
         .empty-list {
@@ -158,6 +157,20 @@ export class TaskOverview extends LitElement implements BeforeEnterObserver {
         }
     }
 
+    private openNewTaskDialog() {
+        this.createTaskDialogRef.value?.openDalog();
+    }
+
+    private async onCreateTask(e) {
+        const { detail } = e;
+        const newTask: Task = {
+            title: detail.taskTitle,
+            description: detail.taskDescription
+        }
+
+        await this.taskService.createTask(newTask);
+    }
+
     protected render() {
         return html`
             <div class="top-bar">
@@ -187,7 +200,7 @@ export class TaskOverview extends LitElement implements BeforeEnterObserver {
                 ${
                     this.__tasksList?.length ? html`
                     <div class="add-new-task">
-                        <button>
+                        <button @click=${this.openNewTaskDialog}>
                             <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M13 8.59277V17.3844" stroke="#C6CFDC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                 <path d="M17.3999 12.9886H8.59985" stroke="#C6CFDC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -229,7 +242,7 @@ export class TaskOverview extends LitElement implements BeforeEnterObserver {
                             </svg>
                             <div>
                             <p class="no-task-message" role="alert">You have no tasks listed</p>
-                            <button class="create-task__btn">
+                            <button class="create-task__btn" @click=${this.openNewTaskDialog}>
                                 <svg width="15" height="14" viewBox="0 0 15 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M7.5 1V13" stroke="#007FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                     <path d="M14 7H1" stroke="#007FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -240,6 +253,8 @@ export class TaskOverview extends LitElement implements BeforeEnterObserver {
                         </div>
                     `
                 }
+
+                <create-task ${ref(this.createTaskDialogRef)} @create-task=${this.onCreateTask}></create-task>
             </div>
         `;
     }

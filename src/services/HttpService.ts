@@ -8,5 +8,8 @@ export class HttService<Type> {
     protected get<Type>(url: string) {
          return axios.get<Type>(url)
     }
+    protected post<Type>(url: string, data: Type) {
+         return axios.post<Type>(url, data)
+    }
 
 }

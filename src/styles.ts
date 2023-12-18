@@ -18,6 +18,17 @@ export const GLOBAL_STYLES = css`
         cursor: pointer;
     }
 
+    input[type=text]::placeholder {
+        color: var(--tl-mutedAzure);
+    }
+    input[type=text] {
+        border: none;
+        appearance: none;
+        height: 22px;
+        background-color: transparent;
+        outline:none;
+    }
+
     .container {
         width: 100%;
     }

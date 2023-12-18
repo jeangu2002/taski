@@ -11,4 +11,8 @@ export class TaskService extends HttService<Task> {
     async getAllTasks() {
         return await this.get<Task[]>('/task')
     }
+
+    async createTask(task:Task) {
+        return await this.post('/create-task', task);
+    }
 }
