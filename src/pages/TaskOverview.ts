@@ -29,7 +29,7 @@ export class TaskOverview extends LitElement implements BeforeEnterObserver {
         super();
         this.__searchInputValue = '';
         this.__tasksList = [];
-        this.taskService = Container.get(TaskService)
+        this.taskService = Container.get(TaskService);
     }
     static override styles = css`
         ${GLOBAL_STYLES}
@@ -161,7 +161,7 @@ export class TaskOverview extends LitElement implements BeforeEnterObserver {
         }
     }
 
-    private openNewTaskDialog() {
+    private openNewTaskDialog(task: Task) {
         this.createTaskDialogRef.value?.openDalog();
     }
 
@@ -176,6 +176,18 @@ export class TaskOverview extends LitElement implements BeforeEnterObserver {
 
         this.refreshTasks();
         this.createTaskDialogRef.value?.closeDalog();
+    }
+
+    async deleteTask(e) {
+        const {taskId} = e.detail;
+        await this.taskService.deleteTask(taskId);
+        this.refreshTasks();
+    }
+
+    async updateTask(e) {
+        const {task} = e.detail;
+        this.createTaskDialogRef.value?.openDalog(task);
+        console.log(task)
     }
 
     protected render() {
@@ -223,6 +235,8 @@ export class TaskOverview extends LitElement implements BeforeEnterObserver {
                                         .taskDescription=${task.description} 
                                         .taskId=${task.taskId}
                                         .isCompleted=${task.completed}
+                                        @delete-task=${this.deleteTask}
+                                        @update-task=${this.updateTask}
                                     >
                                     </task-row>`
                     })}`

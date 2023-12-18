@@ -12,4 +12,8 @@ export class HttService<Type> {
          return axios.post<Type>(url, data)
     }
 
+    protected delete(url:string) {
+        return axios.delete(url);
+    }
+
 }

@@ -2,9 +2,12 @@ import { LitElement, css, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { GLOBAL_STYLES } from '../styles';
 import { Ref, createRef, ref } from "lit/directives/ref.js";
+import { Task } from "../models/Task";
 
 @customElement('create-task')
 export class CreateTask extends LitElement {
+    @property()
+    taskId?: number;
     @property({reflect: true})
     taskTitle?: string;
     @property({reflect: true})
@@ -68,10 +71,18 @@ export class CreateTask extends LitElement {
         }
     `;
 
-    openDalog() {
+    openDalog(task: Task) {
+        if (task) {
+            this.taskId = task.taskId;
+            this.taskDescription = task.description;
+            this.taskTitle = task.title;
+        }
         this.shadowRoot?.querySelector('.create-new-task-dialog')?.classList.add('create-new-task-dialog--open');
     }
     closeDalog() {
+        this.taskId = undefined;
+        this.taskDescription = '';
+        this.taskTitle = '';
         this.shadowRoot?.querySelector('.create-new-task-dialog')?.classList.remove('create-new-task-dialog--open');
     }
 
@@ -79,6 +90,7 @@ export class CreateTask extends LitElement {
             const createTaskEvent = new CustomEvent('create-task', {
                 bubbles: true,
                 detail: {
+                    taskId: this.taskId,
                     taskTitle: this.taskTitleRef.value?.value,
                     taskDescription: this.taskNoteRef.value?.value
                 }
@@ -95,7 +107,7 @@ export class CreateTask extends LitElement {
 
                 <div class="form-group">
                     <input type="checkbox" aria-label="task is completed">
-                    <input type="text" placeholder="what is on your mind" ${ref(this.taskTitleRef)}>
+                    <input type="text" placeholder="what is on your mind" .value=${this.taskTitle} ${ref(this.taskTitleRef)}>
                     
                 </div>
                 <div class="form-group note">
@@ -110,14 +122,15 @@ export class CreateTask extends LitElement {
                         </defs>
                         </svg>
 
-                    <input type="text" placeholder="Add a note" aria-label="add task note"  ${ref(this.taskNoteRef)}>
+                    <input type="text" placeholder="Add a note" aria-label="add task note"
+                      ${ref(this.taskNoteRef)} .value=${this.taskDescription}>
                 </div>
                 <button class="close-dialog-btn" @click=${this.closeDalog}>
                 <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M8 0C3.576 0 0 3.576 0 8C0 12.424 3.576 16 8 16C12.424 16 16 12.424 16 8C16 3.576 12.424 0 8 0ZM11.44 11.44C11.128 11.752 10.624 11.752 10.312 11.44L8 9.128L5.688 11.44C5.376 11.752 4.872 11.752 4.56 11.44C4.248 11.128 4.248 10.624 4.56 10.312L6.872 8L4.56 5.688C4.248 5.376 4.248 4.872 4.56 4.56C4.872 4.248 5.376 4.248 5.688 4.56L8 6.872L10.312 4.56C10.624 4.248 11.128 4.248 11.44 4.56C11.752 4.872 11.752 5.376 11.44 5.688L9.128 8L11.44 10.312C11.744 10.616 11.744 11.128 11.44 11.44Z" fill="#C6CFDC"/>
                       </svg>
                 </button>
-                <button class="create-task-btn" @click=${this.createTask}>Create</button>
+                <button class="create-task-btn" @click=${this.createTask}>${this.taskId ? 'Update' : 'Create'}</button>
             </div>
         `
     }

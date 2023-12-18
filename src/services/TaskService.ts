@@ -15,4 +15,8 @@ export class TaskService extends HttService<Task> {
     async createTask(task:Task) {
         return await this.post('/create-task', task);
     }
+
+    async deleteTask(taskId:number) {
+        return await this.delete(`/delete/${taskId}`);
+    }
 }
