@@ -136,7 +136,11 @@ export class TaskOverview extends LitElement implements BeforeEnterObserver {
 
     protected async firstUpdated(): Promise<void> {
        //this.__tasksList = TASKS;
-       const {data} = await this.taskService.getAllTasks();
+        this.refreshTasks();
+    }
+
+   async refreshTasks() {
+        const {data} = await this.taskService.getAllTasks();
         console.log(data);
         this.__tasksList = data;
     }
@@ -169,6 +173,9 @@ export class TaskOverview extends LitElement implements BeforeEnterObserver {
         }
 
         await this.taskService.createTask(newTask);
+
+        this.refreshTasks();
+        this.createTaskDialogRef.value?.closeDalog();
     }
 
     protected render() {
