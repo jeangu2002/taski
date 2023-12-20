@@ -5,8 +5,8 @@ export const routes = [
         component: 'task-overview',
      },
      {
-      name: 'newTask',
-      path: '/',
-      component: 'create-task',
+      name: 'login',
+      path: '/login',
+      component: 'app-login'
     }
 ]

@@ -71,7 +71,7 @@ export class CreateTask extends LitElement {
         }
     `;
 
-    openDalog(task: Task) {
+    openDalog(task?: Task) {
         if (task) {
             this.taskId = task.taskId;
             this.taskDescription = task.description;

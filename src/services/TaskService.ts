@@ -1,9 +1,9 @@
-import { HttService } from "./HttpService";
+import { HttpService } from "./HttpService";
 import { Task } from "../models/Task";
 import { Service } from "typedi";
 
 @Service()
-export class TaskService extends HttService<Task> {
+export class TaskService extends HttpService<Task> {
   
      constructor() {
         super();
@@ -13,7 +13,7 @@ export class TaskService extends HttService<Task> {
     }
 
     async createTask(task:Task) {
-        return await this.post('/create-task', task);
+        return await this.post('/save-task', task);
     }
 
     async deleteTask(taskId:number) {

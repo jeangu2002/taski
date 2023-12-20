@@ -5,12 +5,13 @@ import { customElement, property } from "lit/decorators.js";
 import '../components/TaskRowComponent'
 import { repeat } from "lit/directives/repeat.js";
 import { TaskService } from "../services/TaskService";
-import { BeforeEnterObserver } from "@vaadin/router";
+import { BeforeEnterObserver, PreventAndRedirectCommands, Router, RouterLocation } from "@vaadin/router";
 import Container from "typedi";
 import '../components/CreateTask';
 import { Task } from "../models/Task";
 import { Ref, createRef, ref } from "lit/directives/ref.js";
 import { CreateTask } from "../components/CreateTask";
+import { AuthenticationService } from "../services/AuthenticationService";
 
 @customElement('task-overview')
 
@@ -25,11 +26,12 @@ export class TaskOverview extends LitElement implements BeforeEnterObserver {
     @property({type: Array})
     __tasksList?:Task[]
     
-    constructor(private taskService:TaskService) {
+    constructor(private taskService:TaskService, private authenticationService: AuthenticationService) {
         super();
         this.__searchInputValue = '';
         this.__tasksList = [];
         this.taskService = Container.get(TaskService);
+        this.authenticationService = Container.get(AuthenticationService);
     }
     static override styles = css`
         ${GLOBAL_STYLES}
@@ -129,14 +131,20 @@ export class TaskOverview extends LitElement implements BeforeEnterObserver {
 
     `;
 
-    onBeforeEnter(location, commands, router) {
+    onBeforeEnter(location: RouterLocation, commands: PreventAndRedirectCommands, router: Router) {
         console.log(location)
         console.log(router)
+
+        if(!this.authenticationService.isAuthenticated()) {
+            Router.go('login');
+        }
+
     }
 
     protected async firstUpdated(): Promise<void> {
        //this.__tasksList = TASKS;
-        this.refreshTasks();
+       if(this.authenticationService.isAuthenticated())
+            this.refreshTasks();
     }
 
    async refreshTasks() {
@@ -165,7 +173,7 @@ export class TaskOverview extends LitElement implements BeforeEnterObserver {
         this.createTaskDialogRef.value?.openDalog();
     }
 
-    private async onCreateTask(e) {
+    private async onCreateTask(e:any) {
         const { detail } = e;
         const newTask: Task = {
             title: detail.taskTitle,
@@ -178,13 +186,13 @@ export class TaskOverview extends LitElement implements BeforeEnterObserver {
         this.createTaskDialogRef.value?.closeDalog();
     }
 
-    async deleteTask(e) {
+    async deleteTask(e:any) {
         const {taskId} = e.detail;
         await this.taskService.deleteTask(taskId);
         this.refreshTasks();
     }
 
-    async updateTask(e) {
+    async updateTask(e:any) {
         const {task} = e.detail;
         this.createTaskDialogRef.value?.openDalog(task);
         console.log(task)
@@ -205,7 +213,7 @@ export class TaskOverview extends LitElement implements BeforeEnterObserver {
                     </svg>
                     
                     ${
-                      !!this.__searchInputValue.length ? html `<button aria-label="delete search text" class="seatch-text__delete-btn" @click=${this._clearSearchInput}>
+                      !!this.__searchInputValue?.length ? html `<button aria-label="delete search text" class="seatch-text__delete-btn" @click=${this._clearSearchInput}>
                       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M8 0C3.576 0 0 3.576 0 8C0 12.424 3.576 16 8 16C12.424 16 16 12.424 16 8C16 3.576 12.424 0 8 0ZM11.44 11.44C11.128 11.752 10.624 11.752 10.312 11.44L8 9.128L5.688 11.44C5.376 11.752 4.872 11.752 4.56 11.44C4.248 11.128 4.248 10.624 4.56 10.312L6.872 8L4.56 5.688C4.248 5.376 4.248 4.872 4.56 4.56C4.872 4.248 5.376 4.248 5.688 4.56L8 6.872L10.312 4.56C10.624 4.248 11.128 4.248 11.44 4.56C11.752 4.872 11.752 5.376 11.44 5.688L9.128 8L11.44 10.312C11.744 10.616 11.744 11.128 11.44 11.44Z" fill="#C6CFDC"/>
                       </svg>
@@ -229,7 +237,7 @@ export class TaskOverview extends LitElement implements BeforeEnterObserver {
                         <span> Add a new task</span>
                     </div>
                     
-                    ${repeat(this.__tasksList, task => task.taskId, (task, index) => {
+                    ${repeat(this.__tasksList, task => task.taskId, (task) => {
                         return html`<task-row 
                                         .taskTitle=${task.title} 
                                         .taskDescription=${task.description} 

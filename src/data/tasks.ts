@@ -1,3 +1,5 @@
+import { Task } from "../models/Task"
+
 export const TASKS:Task[] = [
     {
         taskId: 1,

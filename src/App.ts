@@ -5,11 +5,12 @@ import "reflect-metadata";
 
 import { GLOBAL_STYLES } from "./styles";
 import './pages/TaskOverview';
+import './pages/Login';
 import { routes } from "./routes";
 
 @customElement('todo-app')
 class App extends LitElement {
-    private _router:Router;
+    private _router?:Router;
 
     constructor() {
         super();
@@ -66,6 +67,10 @@ class App extends LitElement {
             display: flex;
         }
 
+        main:has(app-login) {
+            justify-content: center;
+        }
+
         task-overview {
             width: 100%;
             display: grid;
@@ -74,10 +79,10 @@ class App extends LitElement {
 
      `
 
-     protected firstUpdated(): void {
-        const outlet = this.shadowRoot.getElementById('outlet');
+     protected async firstUpdated(): Promise<void> {
+        const outlet = this.shadowRoot!.getElementById('outlet');
         this._router = new Router(outlet);
-        this._router.setRoutes(routes)
+        await this._router.setRoutes(routes)
      }
     
 
@@ -105,3 +110,9 @@ class App extends LitElement {
         `
     }
 }
+
+declare global {
+    interface HTMLElementTagNameMap {
+      'todo-app': App
+    }
+  }
